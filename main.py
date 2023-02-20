@@ -1,4 +1,4 @@
-VERSION = "1.023"
+VERSION = "1.03"
 
 foo = "bar"
 x = "x"
