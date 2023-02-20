@@ -1,34 +1,49 @@
-VERSION = "1.0"
+VERSION = "1.01"
+
+# we download and read version of filepath
+# we need to execute the new file and delete the old
 
 import network
 wlan = network.WLAN(network.STA_IF)
 wlan.active(True)
 
-ssid = ""
-password = ""
-wlan.connect(ssid, password)
+wlan.connect(secrets.ssid, secrets.password)
 
 import urequests
+import ujson
+import os
+import urequests
+import time
+import binascii
 
 username = "adriangalilea"
 repository = "MicropythonOTA"
+filepath = "main.py"
 
-response = urequests.get(f"https://api.github.com/repos/{username}/{repository}/releases/latest").json()
+headers={'User-Agent': 'adriangalilea'}
 
-print(response)
-latest_version = response.json()["tag_name"]
+url = f"https://api.github.com/repos/{username}/{repository}/contents/{filepath}"
+response = urequests.get(url, headers=headers)
+download_url = ujson.loads(response.content.decode())["download_url"]
+response = urequests.get(download_url)
+with open("myfile.py", "wb") as f:
+    f.write(response.content)
 
-print(latest_version)
+# Open the file
+with open('myfile.py', 'r') as f:
+    # Read the contents of the file
+    contents = f.read()
 
-import os
-import urequests
+    # Parse the contents to extract the value of the VERSION variable
+    version = None
+    for line in contents.split('\n'):
+        if line.startswith('VERSION'):
+            version = line.split('=')[1].strip()
+            break
 
-if latest_version > VERSION:
-    response = urequests.get(f"https://github.com/{username}/{repository}/archive/{latest_version}.zip")
-    with open("update.zip", "wb") as update_file:
-        update_file.write(response.content)
-    os.rename("main.py", "main.bak")
-    os.mkdir("main")
-    os.system("unzip update.zip -d main")
-    os.remove("update.zip")
-    os.rename("main/main.py", "main.py")
+    # Print the value of the VERSION variable
+    print(f'The version is: {version}')
+
+# if latest_version > float(VERSION):
+#     pass
+    
