@@ -83,4 +83,6 @@ while True:
     # Access a variable defined in the file from the calling namespace
     print(namespace['foo'])
     print(f'Free memory: {gc.mem_free()} bytes')
+    
+    time.sleep(60 * 10)
     print()
